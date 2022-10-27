@@ -14,15 +14,15 @@ on:
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
-        default: 'https://github.com/twrpdtgen/android_device_infinix_Infinix-X688C'
+        default: 'https://github.com/NusaStudio/android_device_infinix_Infinix-X688C'
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
-        default: 'vnd_x688c_h6220-user-10-QP1A.190711.020-59009-release-keys'
+        default: 'main'
       DEVICE_PATH:
         description: 'DEVICE_PATH'
         required: true
-        default: 'device/infinix/X688C'
+        default: 'device/infinix/Infinix-X688C'
       COMMON_TREE_URL:
         description: 'COMMON_TREE_URL (if no common tree, leave blank)'
         required: false
