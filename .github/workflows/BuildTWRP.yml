@@ -16,7 +16,7 @@ on:
         description: 'DEVICE_TREE_URL'
         required: true
         default: 'https://github.com/NusaStudio/android_device_infinix_Infinix-X688C'
-      DEVICE_TREE_BRANCH
+      DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
         default: 'main'
