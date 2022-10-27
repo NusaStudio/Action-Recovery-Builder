@@ -124,7 +124,7 @@ jobs:
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Check Build Tree
-      uses: haya14busa/action-cond@v1
+      uses: haya14busa/action-cond@dependabot/npm_and_yarn/actions/core-1.9.1
       id: buildtree
       with:
         cond: ${{ github.event.inputs.MANIFEST_BRANCH == 'twrp-11' || github.event.inputs.MANIFEST_BRANCH == 'twrp-12.1' }}
