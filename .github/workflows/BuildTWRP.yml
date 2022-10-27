@@ -6,19 +6,20 @@ on:
       MANIFEST_URL:
         description: 'MANIFEST_URL (if using SSH keys, use git@github.com:repo URL format)'
         required: true
-        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git'
+        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni'
       MANIFEST_BRANCH:
         description: 'MANIFEST_BRANCH'
         required: true
-        default: 'twrp-12.1'
+        default: 'twrp-10.0-deprecated'
+
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
-        default: 'https://github.com/twrpdtgen/android_device_infinix_Infinix-X688C'
-      DEVICE_TREE_BRANCH:
+        default: 'https://github.com/NusaStudio/android_device_infinix_Infinix-X688C'
+      DEVICE_TREE_BRANCH
         description: 'DEVICE_TREE_BRANCH'
         required: true
-        default: 'vnd_x688c_h6220-user-10-QP1A.190711.020-59009-release-keys'
+        default: 'main'
       DEVICE_PATH:
         description: 'DEVICE_PATH'
         required: true
