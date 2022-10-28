@@ -6,7 +6,7 @@ on:
       MANIFEST_URL:
         description: 'MANIFEST_URL (if using SSH keys, use git@github.com:repo URL format)'
         required: true
-        default: 'https://github.com/SHRP/manifest.git'
+        default: 'https://github.com/SHRP/platform_manifest_twrp_omni'
       MANIFEST_BRANCH:
         description: 'MANIFEST_BRANCH'
         required: true
