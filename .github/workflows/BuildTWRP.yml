@@ -19,11 +19,11 @@ on:
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
-        default: 'main'
+        default: 'twrp'
       DEVICE_PATH:
         description: 'DEVICE_PATH'
         required: true
-        default: 'device/infinix/Infinix-X688C'
+        default: 'device/infinix/mt6765'
       COMMON_TREE_URL:
         description: 'COMMON_TREE_URL (if no common tree, leave blank)'
         required: false
@@ -37,7 +37,7 @@ on:
       MAKEFILE_NAME:
         description: 'MAKEFILE_NAME'
         required: true
-        default: 'omni_Infinix-X688C'
+        default: 'omni_mt6765'
       BUILD_TARGET:
         description: 'BUILD_TARGET'
         required: true
