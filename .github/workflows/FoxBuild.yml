@@ -1,0 +1,150 @@
+name: OrangeFox Build
+
+# Credits to:
+# https://github.com/TeamWin
+# https://gitlab.com/OrangeFox
+# https://github.com/azwhikaru for Recovery Builder Template
+# And all Contributors in every repositories I used
+
+on:
+  workflow_dispatch:
+    inputs:
+      MANIFEST_URL:
+        description: 'Manifest'
+        required: true
+        default: ''
+        type: choice
+        options:
+        - https://gitlab.com/OrangeFox/sync.git
+      MANIFEST_BRANCH:
+        description: 'OrangeFox Branch'
+        required: true
+        default: '10' # Branch 11 and 12.1's lunch command doesn't work using this action builder.
+        type: choice
+        options:
+        - 12.1
+        - 11.0
+        - 10.0
+        - 9.0
+      DEVICE_TREE:
+        description: 'Custom Recovery Tree'
+        required: true
+        default: 'https://github.com/NusaStudio/android_device_infinix_Infinix-X688C'
+      DEVICE_TREE_BRANCH:
+        description: 'Custom Recovery Tree Branch'
+        required: true
+        default: 'hotplay10'
+      DEVICE_PATH:
+        description: 'Specify your device path.'
+        required: true
+        default: 'device/Infinix/hotplay10'
+      DEVICE_NAME:
+        description: 'Specify your Device Codename.'
+        required: true
+        default: 'hotplay10'
+      MAKEFILE_NAME:
+        description: 'Specify your twrp/omni_codename'
+        required: true
+        default: 'omni_hotplay10'
+      BUILD_TARGET:
+        description: 'Specify your Build Target'
+        required: true
+        default: 'OrangeFoxRecovery'
+        type: choice
+        options:
+        - boot
+        - recovery
+        - vendor_boot
+
+jobs:
+  build:
+    if: github.event.repository.owner.id == github.event.sender.id
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check Out
+      uses: actions/checkout@v3.1.0
+      
+    - name: Set Current Date # For Build Date Info, currently using Asia/Manila
+      id: today
+      run: |
+        echo "date=$(TZ=Asia/Jakarta date +%Y%m%d-%l:%M%p)" >> $GITHUB_OUTPUT
+        
+    - name: Cleanup
+      uses: rokibhasansagar/slimhub_actions@main
+
+    - name: Set Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 10
+      
+    - name: Initial Packages
+      run: |
+        sudo apt update
+        sudo apt -y upgrade
+        sudo apt -y install git aria2 
+
+    - name: Necessary Packages
+      run: |
+        git clone https://github.com/cd-Spidey/Random.git ./buildenv
+        sudo bash buildenv/setup/packages/build_env.sh
+        
+    - name: Install OpenJDK
+      run: |
+        git clone https://github.com/cd-Spidey/Random.git ./opendjk
+        sudo bash opendjk/setup/packages/open_jdk.sh
+      
+    - name: Set-up Manifest
+      run: |
+        mkdir OrangeFox
+        cd OrangeFox
+        echo "workdir=$(pwd)" >> $GITHUB_OUTPUT
+        git config --global user.name "NusaStudio"
+        git config --global user.email "projectnusastudio@gmail.com"
+        git clone https://gitlab.com/OrangeFox/sync.git
+      id: pwd
+
+    - name: Sync Manifest
+      run: |
+        cd sync
+        ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+      working-directory: OrangeFox
+
+    - name: Clone Device Tree
+      run: |
+        cd fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        git clone ${{ github.event.inputs.DEVICE_TREE }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
+      working-directory: ${{ steps.pwd.outputs.workdir }}
+
+    - name: Check Manifest Branch
+      uses: haya14busa/action-cond@v1
+      id: fox_branch
+      with:
+        cond: ${{ github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' }}
+        if_true: lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
+        if_false: lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && mka ${{ github.event.inputs.BUILD_TARGET }}image
+
+    - name: Building OrangeFox
+      run: |
+        cd fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        ccache -M 10G
+        source build/envsetup.sh
+        export ALLOW_MISSING_DEPENDENCIES=true
+        export FOX_USE_TWRP_RECOVERY_IMAGE_BUILDER=1
+        export LC_ALL="C"
+        ${{ steps.fox_branch.outputs.value }}
+      working-directory: ${{ steps.pwd.outputs.workdir }}
+      
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/OrangeFox*.img
+          OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/OrangeFox*.zip
+        name: Unofficial OrangeFox for ${{ github.event.inputs.DEVICE_NAME }}
+        tag_name: ${{ github.run_id }}
+        body: |
+          Build: fox_${{ github.event.inputs.MANIFEST_BRANCH }} - ${{ steps.today.outputs.date }}
+          Device: ${{ github.event.inputs.DEVICE_TREE }}/tree/${{ github.event.inputs.DEVICE_TREE_BRANCH }}
+          Manifest: ${{ github.event.inputs.MANIFEST_URL }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
