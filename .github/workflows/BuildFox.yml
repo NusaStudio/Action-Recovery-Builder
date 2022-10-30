@@ -9,11 +9,11 @@ on:
         default: ''
         type: choice
         options:
-        - https://gitlab.com/OrangeFox/sync.git
+        - https://gitlab.com/OrangeFox/Manifest.git
       MANIFEST_BRANCH:
         description: 'OrangeFox Branch'
         required: true
-        default: '10' # Branch 11 and 12.1's lunch command doesn't work using this action builder.
+        default: '10.0' # Branch 11 and 12.1's lunch command doesn't work using this action builder.
         type: choice
         options:
         - 12.1
